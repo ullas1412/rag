@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CampusMate - GEC Hassan Student Assistant</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <!-- Markdown parser -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Top Header -->
+    <header class="header">
+      <div class="header-brand">
+        <div class="college-logo">
+          <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+          </svg>
+        </div>
+        <div>
+          <div class="brand-title">
+            <span class="title-main">CampusMate</span>
+            <span class="badge-tag">GEC Hassan RAG</span>
+          </div>
+          <div class="brand-sub">Govt. Engineering College Hassan &bull; VTU Code: 4HN &bull; KCET: E146</div>
+        </div>
+      </div>
+
+      <div class="header-nav">
+        <button class="nav-btn active" id="tabChatBtn" onclick="switchTab('chat')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+          </svg>
+          Student Chat
+        </button>
+        <button class="nav-btn" id="tabDirectionsBtn" onclick="switchTab('directions')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="3 11 22 2 13 21 11 13 3 11"></polygon>
+          </svg>
+          Campus Directions
+        </button>
+        <button class="nav-btn" id="tabCalcBtn" onclick="switchTab('calc')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="4" y="2" width="16" height="20" rx="2"></rect>
+            <line x1="8" y1="6" x2="16" y2="6"></line>
+            <line x1="16" y1="14" x2="16" y2="18"></line>
+            <path d="M8 10h.01M12 10h.01M16 10h.01M8 14h.01M12 14h.01M8 18h.01M12 18h.01"></path>
+          </svg>
+          VTU Calculator
+        </button>
+        <button class="nav-btn" id="tabAdminBtn" onclick="switchTab('admin')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+          </svg>
+          Documents (Admin)
+        </button>
+        <div class="status-indicator">
+          <span class="pulse-dot"></span>
+          <span>Verified Knowledge Base</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="main-content">
+      
+      <!-- TAB 1: Student Chat Interface -->
+      <section id="chatSection" class="tab-pane active">
+        <div class="chat-wrapper">
+          
+          <!-- Category Filter Bar -->
+          <div class="category-filter-bar">
+            <button class="cat-pill active" onclick="filterChips('all')">🌟 All Inquiries</button>
+            <button class="cat-pill" onclick="filterChips('directions')">📍 Location & Directions</button>
+            <button class="cat-pill" onclick="filterChips('first_year')">🌱 1st Year & Induction</button>
+            <button class="cat-pill" onclick="filterChips('academics')">🎓 Attendance & VTU Rules</button>
+            <button class="cat-pill" onclick="filterChips('scholarships')">💰 SSP & Fees</button>
+            <button class="cat-pill" onclick="filterChips('transport')">🚌 Bus Pass & Hostels</button>
+            <button class="cat-pill" onclick="filterChips('placements')">💼 Placements & CTC</button>
+            <button class="cat-pill" onclick="filterChips('courses')">📚 Coursework & Labs</button>
+          </div>
+
+          <!-- Quick Suggestions Bar -->
+          <div class="quick-bar">
+            <div class="chips-container" id="quickChips">
+              <!-- Dynamically populated chips -->
+            </div>
+          </div>
+
+          <!-- Chat Messages Area -->
+          <div class="chat-container" id="chatContainer">
+            <!-- Welcome message -->
+            <div class="message bot-message">
+              <div class="avatar bot-avatar">CM</div>
+              <div class="message-content">
+                <div class="message-header">
+                  <strong>CampusMate Assistant</strong>
+                  <span class="time-label">Active</span>
+                </div>
+                <div class="message-body">
+                  <p>Hello! Welcome to <strong>CampusMate</strong>, the official AI student assistant for <strong>Government Engineering College, Hassan</strong> (Affiliated to VTU Belagavi).</p>
+                  <p>I provide instant, reliable answers grounded in official college handbooks, campus directions, VTU regulations, syllabus, scholarship guides, and placement records. Click any inquiry above or ask below!</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Input Controls -->
+          <div class="chat-input-area">
+            <form id="chatForm" onsubmit="handleSendMessage(event)">
+              <div class="input-box-wrapper">
+                <textarea 
+                  id="userInput" 
+                  rows="1" 
+                  placeholder="Ask where a department or office is, or ask about attendance, bus pass, VTU marks..." 
+                  onkeydown="handleKeyDown(event)"
+                  required></textarea>
+                <div class="input-actions">
+                  <div class="left-actions">
+                    <button type="button" class="btn-icon" title="Voice Input (Speech to Text)" onclick="startVoiceInput()">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                        <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                        <line x1="12" y1="19" x2="12" y2="23"></line>
+                        <line x1="8" y1="23" x2="16" y2="23"></line>
+                      </svg>
+                    </button>
+                    <button type="button" class="btn-icon" title="Clear Chat" onclick="clearChat()">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                      </svg>
+                    </button>
+                  </div>
+                  <button type="submit" id="sendBtn" class="btn-send">
+                    <span>Ask CampusMate</span>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <line x1="22" y1="2" x2="11" y2="13"></line>
+                      <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </form>
+            <div class="input-footer">
+              Grounded in official GEC Hassan institutional records. Answers include verifiable source citations.
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- TAB 2: Campus Map & Direction Navigator -->
+      <section id="directionsSection" class="tab-pane">
+        <div class="directions-wrapper">
+          <div class="directions-header">
+            <div>
+              <h2>Campus Location & Step-by-Step Directions</h2>
+              <p class="text-muted">Find exact building blocks, floor numbers, room IDs, and walking routes across GEC Hassan.</p>
+            </div>
+            <div class="search-location-box">
+              <input type="text" id="locationSearchInput" placeholder="🔍 Search e.g. Principal, Library, Exam, CSE HOD, Canteen, Hostel..." oninput="filterLocations()">
+            </div>
+          </div>
+
+          <!-- Quick Location Filters -->
+          <div class="landmark-filter-pills">
+            <button class="l-pill active" onclick="filterLocationCategory('all')">All Buildings</button>
+            <button class="l-pill" onclick="filterLocationCategory('admin')">🏛️ Admin Block</button>
+            <button class="l-pill" onclick="filterLocationCategory('academic1')">💻 CSE & ECE (Block 1)</button>
+            <button class="l-pill" onclick="filterLocationCategory('academic2')">⚙️ Civil, Mech & Basic Sci (Block 2)</button>
+            <button class="l-pill" onclick="filterLocationCategory('library')">📖 Central Library</button>
+            <button class="l-pill" onclick="filterLocationCategory('amenities')">🏡 Hostels, Canteen & Sports</button>
+            <button class="l-pill" onclick="filterLocationCategory('transit')">🚌 City Transit Routes</button>
+          </div>
+
+          <!-- Google Maps Directions -->
+          <div class="card google-maps-card">
+            <div class="card-header">
+              <h3>Google Maps Directions to GEC Hassan</h3>
+              <span class="text-muted">Open live turn-by-turn navigation in Google Maps</span>
+            </div>
+            <div class="google-maps-body">
+              <div class="gmaps-inputs">
+                <label>Starting point (your location or address)
+                  <input type="text" id="gmapsOrigin" placeholder="e.g. Hassan KSRTC Bus Stand or your address">
+                </label>
+                <label>Destination (campus location)
+                  <select id="gmapsDestination">
+                    <option value="Government Engineering College Hassan, B.M. Road, Hassan, Karnataka, India">College Main Gate (GEC Hassan)</option>
+                  </select>
+                </label>
+                <label>Travel mode
+                  <select id="gmapsMode">
+                    <option value="driving">Driving</option>
+                    <option value="walking">Walking</option>
+                    <option value="bicycling">Bicycling</option>
+                    <option value="transit">Transit</option>
+                  </select>
+                </label>
+                <div class="gmaps-actions">
+                  <button class="btn-primary" onclick="useMyLocation()">Use My Location</button>
+                  <button class="btn-primary" onclick="openGoogleMapsDirections()">Open in Google Maps</button>
+                </div>
+                <div id="gmapsResult" class="gmaps-result"></div>
+              </div>
+              <div class="gmaps-embed">
+                <iframe
+                  title="GEC Hassan on Google Maps"
+                  loading="lazy"
+                  referrerpolicy="no-referrer-when-downgrade"
+                  src="https://www.google.com/maps?q=Government+Engineering+College+Hassan,+B.M.+Road,+Hassan,+Karnataka,+India&output=embed">
+                </iframe>
+                <a class="gmaps-open-link" href="https://www.google.com/maps/search/?api=1&query=Government+Engineering+College+Hassan,+B.M.+Road,+Hassan,+Karnataka,+India" target="_blank" rel="noopener">Open campus on Google Maps ↗</a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Locations Grid -->
+          <div class="locations-grid" id="locationsGrid">
+            <!-- Dynamically populated location cards -->
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 3: VTU Student Tools & Calculator -->
+      <section id="calcSection" class="tab-pane">
+        <div class="calc-wrapper">
+          <div class="calc-header">
+            <h2>VTU Academic Calculators & Passing Rules</h2>
+            <p class="text-muted">Instant tools built specifically for Visvesvaraya Technological University (VTU) regulations at GEC Hassan.</p>
+          </div>
+
+          <div class="calc-grid">
+            <!-- Tool 1: Passing Marks Predictor -->
+            <div class="calc-card">
+              <div class="calc-card-header">
+                <span class="calc-badge">Exam Predictor</span>
+                <h3>"Can I Pass?" SEE Marks Calculator</h3>
+              </div>
+              <p class="calc-desc">Enter your Continuous Internal Evaluation (CIE) score out of 50 to see exact required marks in the Semester End Exam (SEE).</p>
+              
+              <div class="calc-form">
+                <label for="cieInput">Your CIE Score (out of 50):</label>
+                <input type="number" id="cieInput" min="0" max="50" placeholder="e.g. 28" oninput="calculatePassing()">
+              </div>
+
+              <div id="passResult" class="result-box">
+                <div class="result-title">Enter your CIE marks above to calculate.</div>
+              </div>
+            </div>
+
+            <!-- Tool 2: CGPA to Percentage Converter -->
+            <div class="calc-card">
+              <div class="calc-card-header">
+                <span class="calc-badge">Converter</span>
+                <h3>VTU CGPA to Percentage</h3>
+              </div>
+              <p class="calc-desc">Converts your CGPA to equivalent percentage using official VTU formula: <code>(CGPA - 0.75) &times; 10</code>.</p>
+              
+              <div class="calc-form">
+                <label for="cgpaInput">Your Cumulative CGPA (out of 10):</label>
+                <input type="number" id="cgpaInput" min="0" max="10" step="0.01" placeholder="e.g. 8.25" oninput="calculatePercentage()">
+              </div>
+
+              <div id="cgpaResult" class="result-box">
+                <div class="result-title">Enter your CGPA above to convert.</div>
+              </div>
+            </div>
+
+            <!-- Tool 3: Quick Passing Reference Table -->
+            <div class="calc-card full-span">
+              <div class="calc-card-header">
+                <span class="calc-badge">VTU Norms</span>
+                <h3>Official Passing & Classification Reference</h3>
+              </div>
+              <div class="table-container">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Component</th>
+                      <th>Maximum Marks</th>
+                      <th>Minimum Threshold</th>
+                      <th>Mandatory Condition</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>CIE (Internals)</strong></td>
+                      <td>50 Marks</td>
+                      <td>20 Marks (40%)</td>
+                      <td>Must secure &ge; 20 to be eligible for SEE</td>
+                    </tr>
+                    <tr>
+                      <td><strong>SEE (Semester Exam)</strong></td>
+                      <td>50 Marks (scaled from 100)</td>
+                      <td>18 Marks (35%)</td>
+                      <td>Must secure &ge; 35 out of 100 in written paper</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Aggregate Total</strong></td>
+                      <td>100 Marks</td>
+                      <td>40 Marks (40%)</td>
+                      <td>Combined CIE + SEE must be &ge; 40 Marks</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Attendance</strong></td>
+                      <td>100%</td>
+                      <td>85% (75% Medical)</td>
+                      <td>Less than 75% results in course detention (NSAR)</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 4: Admin & Knowledge Base Management -->
+      <section id="adminSection" class="tab-pane">
+        <div class="admin-wrapper">
+          
+          <div class="admin-header-row">
+            <div>
+              <h2>Knowledge Base Administration</h2>
+              <p class="text-muted">Manage official GEC Hassan institutional records, upload notices or syllabus PDFs, and re-index vector embeddings.</p>
+            </div>
+            <button class="btn-primary" onclick="rebuildIndex()" id="rebuildBtn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M23 4v6h-6"></path>
+                <path d="M1 20v-6h6"></path>
+                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+              </svg>
+              Re-index Vector Store
+            </button>
+          </div>
+
+          <!-- Stats Grid -->
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-label">Total Documents</div>
+              <div class="stat-value" id="statDocs">-</div>
+              <div class="stat-desc">Approved institutional files</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Total Vector Chunks</div>
+              <div class="stat-value" id="statChunks">-</div>
+              <div class="stat-desc">Embedded in ChromaDB</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Embedding Model</div>
+              <div class="stat-value small-text" id="statModel">all-MiniLM-L6-v2</div>
+              <div class="stat-desc">Local ONNX Transformer</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Vector Database</div>
+              <div class="stat-value small-text" id="statStore">ChromaDB</div>
+              <div class="stat-desc">Persistent Local Storage</div>
+            </div>
+          </div>
+
+          <!-- Upload and Document Management Grid -->
+          <div class="admin-grid">
+            <!-- Upload Box -->
+            <div class="card upload-card">
+              <h3>Upload College Document</h3>
+              <p class="text-muted">Add new syllabus, exam notices, circulars, or policies (.pdf, .md, .txt).</p>
+              
+              <form id="uploadForm" onsubmit="handleFileUpload(event)">
+                <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+                  <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                  </svg>
+                  <div class="drop-text">Click to choose or drag & drop files here</div>
+                  <div class="drop-sub">Supported: PDF, Markdown, Text</div>
+                  <input type="file" id="fileInput" accept=".pdf,.md,.txt" style="display:none" onchange="updateFileNameDisplay()">
+                </div>
+                <div id="selectedFileName" class="selected-file-label"></div>
+                <button type="submit" class="btn-primary full-width" id="uploadBtn">
+                  Upload & Auto-Index
+                </button>
+              </form>
+            </div>
+
+            <!-- Documents Table -->
+            <div class="card doc-table-card">
+              <div class="card-header">
+                <h3>Active Institutional Documents</h3>
+                <button class="btn-text" onclick="loadDocumentsList()">Refresh List</button>
+              </div>
+              <div class="table-container">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Document Name</th>
+                      <th>Type</th>
+                      <th>Size</th>
+                    </tr>
+                  </thead>
+                  <tbody id="documentsTableBody">
+                    <tr><td colspan="3" class="text-center">Loading documents...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script src="/static/script.js"></script>
+</body>
+</html>

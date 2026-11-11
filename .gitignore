@@ -1,0 +1,24 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environments & secrets
+.env
+.venv/
+env/
+venv/
+
+# Chroma DB vector database (auto-generated on app startup)
+backend/data/chroma_db/
+
+# LangChain cloned repository (separate repo)
+langchain/
+
+# IDE / Editor files
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
